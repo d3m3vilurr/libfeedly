@@ -12,7 +12,8 @@ except ImportError:
 from subscription import Subscription
 from stream import Stream
 from item import Item
-from util import user_id, feed_id, category_id, tag_id, APIError
+from util import user_id, feed_id, category_id, tag_id, \
+                 parse_oauth_code, APIError
 
 
 def _append_ck(params):
@@ -105,10 +106,7 @@ class API(object):
         return resp.url
 
     def split_auth_code(self, end_auth_uri):
-        parse = urlparse.urlparse(end_auth_uri)
-        params = dict(urlparse.parse_qsl(parse.query))
-        code = params.get('code').replace(' ', '+')
-        return code
+        return util.parse_oauth_code(end_auth_uri)
 
     def create_token(self, code,
                      client_id='feedly',
