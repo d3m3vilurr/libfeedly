@@ -1,3 +1,6 @@
+""":mod:`pydeely.tool`
+~~~~~~~~~~~~~~~~~~~~~
+"""
 import sys
 import os
 from api import API
@@ -13,114 +16,121 @@ except ImportError:
     def strip(html):
         return html
 
-LOCAL = {}
 api = API()
 
+def print_menu(title, menus, is_main=False):
+    print
+    if title:
+        print title
+        print
+    for i, text in enumerate(menus):
+        print '%3d. %s' % (i + 1, text)
+    print
+    if is_main:
+        print '  0. Exit'
+    else:
+        print '  0. Back'
+    print
+
 def auth():
-    print 'Authorization'
-    print 
-    print '1. Make auth code'
-    print '2. Generate Token File'
-    print '3. Load Token'
-    print '4. Refresh Token'
-    print '0. Back'
-    print
-    v = input('> ')
-    print
-    if v == 1:
-        print 'Open this URL on Internet browser'
-        print api.make_auth_url()
-        i = raw_input('End URI > ')
-        LOCAL['code'] = api.split_auth_code(i)
-        print 'CODE: %s' % LOCAL['code']
-    elif v == 2:
-        if not LOCAL.get('code'):
-            LOCAL['code'] = raw_input('CODE> ')
-        tokens = api.create_token(LOCAL['code'])
-        with open('TOKEN', 'w') as w:
-            w.write(pickle.dumps(tokens))
-        api.auth_key = tokens['access_token']
-        return 0
-    elif v == 3:
-        with open('TOKEN') as r:
-            tokens = pickle.load(r)
+    menu = ['Generate Token', 'Load Token', 'Refresh Token']
+    while True:
+        print_menu('Authrization', menu)
+        v = raw_input('> ')
+        try:
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return 0
+        if v == 1:
+            print 'Open this URL on Internet browser'
+            print api.make_auth_url()
+            i = raw_input('Enter End URI> ')
+            code = api.split_auth_code(i)
+            tokens = api.create_token(code)
+            with open('TOKEN', 'w') as w:
+                w.write(pickle.dumps(tokens))
             api.auth_key = tokens['access_token']
-        return 0
-    elif v == 4:
-        refresh_token = None
-        if not os.path.exists('TOKEN'):
-            refresh_token = raw_input('REFRESH TOKEN> ')
-        else:
+            return 0
+        elif v == 2:
             with open('TOKEN') as r:
                 tokens = pickle.load(r)
-                refresh_token = tokens['refresh_token']
-        tokens = api.refresh_token(refresh_token)
-        tokens['refresh_token'] = refresh_token
-        api.auth_key = tokens['access_token']
-        with open('TOKEN', 'w') as w:
-            w.write(pickle.dumps(tokens))
-        api.auth_key = tokens['access_token']
-        return 0
-    return v
-    
+                api.auth_key = tokens['access_token']
+            return 0
+        elif v == 3:
+            refresh_token = None
+            if not os.path.exists('TOKEN'):
+                refresh_token = raw_input('REFRESH TOKEN> ')
+            else:
+                with open('TOKEN') as r:
+                    tokens = pickle.load(r)
+                    refresh_token = tokens['refresh_token']
+            tokens = api.refresh_token(refresh_token)
+            tokens['refresh_token'] = refresh_token
+            api.auth_key = tokens['access_token']
+            with open('TOKEN', 'w') as w:
+                w.write(pickle.dumps(tokens))
+            api.auth_key = tokens['access_token']
+            return 0
+        return
+
+def _print_item(item):
+    print item.title
+    print '    URL: %s' % item.href
+    print '    Author: %s' % item.author
+    print '    Date: %s' % (item.published_date or item.crawled_date)
+    print '=' * len(item.title)
+    print strip(item.html)
+
 def print_item(item):
     while True:
-        print item.title
-        print item.href
-        print '=' * len(item.title)
-        print strip(item.html)
-        print '=' * 80
-        print 'Author: %s' % item.author
-        print 'Date: %s' % (item.published_date or item.crawled_date)
-        print
-        print item.unread and '1. Mark as read' or '1. Keep unread'
-        print item.saved_for_later and '2. Unsave' or '2. Save'
-        print '3. Next'
-        print '4. Prev'
-        print '0. Return stream list'
-        print
+        _print_item(item)
+        print_menu(None, [item.unread and 'Mark as read' or 'Keep unread',
+                          item.saved_for_later and 'Unsave' or 'Save',
+                          'Next', 'Prev'])
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 1:
-                if item.unread:
-                    item.mark_as_read()
-                else:
-                    item.keep_unread()
-            elif v == 2:
-                item.saved_for_later = not item.saved_for_later
-            elif v in [3, 4]:
-                return v
-            elif v == 0:
-                return
-        except Exception:
+            v = int(v):
+        except ValueError:
             continue
+        if not v:
+            return
+        if v == 1:
+            if item.unread:
+                item.mark_as_read()
+            else:
+                item.keep_unread()
+        elif v == 2:
+            item.saved_for_later = not item.saved_for_later
+        elif v == 3:
+            return 'next'
+        elif v == 4:
+            return 'prev'
 
-def print_items(items):
+def print_items(title, items):
+    item_titles = map(lambda x: x.title, items)
     while True:
-        print "Stream list"
-        print
-        for i, item in enumerate(items):
-            print '%d. %s' % (i + 1, item.title)
-        print "0. back"
-        print
+        print_menu(title, item_titles)
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 0:
-                return 0
-            while True:
-                _ = print_item(items[v - 1])
-                if not _:
-                    break
-                if _ == 3:
-                    v += 1
-                if _ == 4:
-                    v -= 1
-                if v < 1 or v > 9:
-                    break
-        except Exception:
-            return -1
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return 0
+        while True:
+            if v < 1 or v > 9:
+                break
+            cont = print_item(items[v - 1])
+            if not cont:
+                break
+            if cont == 'next':
+                v += 1
+            if cont == 'prev':
+                v -= 1
 
-def print_streams(stream):
+def print_streams(title, stream):
     items = []
     for i, item in enumerate(stream.unread_items):
         items.append(item)
@@ -129,130 +139,109 @@ def print_streams(stream):
                 return
             items = []
     if len(items):
-        print_items(items)
+        print_items(title, items)
 
 def print_subscription(subscription):
+    menus = ['Stream', 'Mark as read', 'Unsubscribe']
     while True:
-        print subscription.title
-        print
-        print '1. substream'
-        print '2. mark as read'
-        print '3. unsubscribe'
-        print '0. back'
-        print
+        print_menu(subscription.title, menus)
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 0:
-                return
-            if v == 1:
-                print_stream(subscription.stream)
-            elif v == 2:
-                api.all_mark_as_read([subscription.id])
-            elif v == 3:
-                api.unsubscribe(subscription.feed_uri)
-                return 'removed'
-        except Exception:
-            pass
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return
+        if v == 1:
+            print_streams(subscription.title, subscription.stream)
+        elif v == 2:
+            api.all_mark_as_read([subscription.id])
+        elif v == 3:
+            api.unsubscribe(subscription.feed_uri)
+            return 'removed'
 
 def print_subscriptions(label, subscriptions):
+    title = "%s's feeds" % label
     while True:
-        print "%s's subscriptions" % label
-        print
-        for i, subscription in enumerate(subscriptions):
-            print "%3d. %s" % (i + 1, subscription.title)
-        print "  0. back"
-        print
+        print_menu(title, (s.title for x in subscriptions))
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 0:
-                return
-            if v < 1 or v > len(subscriptions):
-                continue
-            if print_subscription(subscriptions[v - 1]) == 'removed':
-                subscriptions.remove(subscriptions[v - 1])
-        except Exception:
-            pass
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return
+        if v < 1 or v > len(subscriptions):
+            continue
+        if print_subscription(subscriptions[v - 1]) == 'removed':
+            subscriptions.remove(subscriptions[v - 1])
 
 def print_category(label, data):
+    menus = ['Stream', 'Detail feeds', 'Mark as read']
     while True:
-        print label
-        if data.get('id'):
-            print "1. Category stream" 
-        print "2. Subscription lists"
-        print "3. Mark as read"
-        print "0. back"
-        print
+        print_menu(label, menus)
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 0:
-                return
-            elif v == 1:
-                if data.get('id'):
-                    print_streams(api.category(label))
-            elif v == 2:
-                print_subscriptions(label, data['subscriptions'])
-            elif v == 3:
-                feed_ids = map(lambda x: x.id, data['subscriptions'])
-                api.all_mark_as_read(feed_ids)
-        except Exception:
-            pass
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return
+        elif v == 1:
+            if data.get('id'):
+                print_streams(label, api.category(label))
+            else:
+                print 'This category not provide stream'
+        elif v == 2:
+            print_subscriptions(label, data['subscriptions'])
+        elif v == 3:
+            feed_ids = map(lambda x: x.id, data['subscriptions'])
+            api.all_mark_as_read(feed_ids)
 
-def categories():
+def print_categories():
     categories = list(api.categories.iteritems())
+    category_names = map(lambda (x, y): x, categories)
     while True:
-        print "Categories"
-        print
-        for i, (label, data) in enumerate(categories):
-            print "%3d. %s" % (i + 1, label)
-        print "  0. back"
-        print
+        print_menu('Categories', category_names)
+        v = raw_input('> ')
         try:
-            v = input('> ')
-            if v == 0:
-                return
-            if v < 1 or v > len(categories):
-                continue
-            print_category(*categories[v - 1])
-        except Exception:
-            pass
+            v = int(v):
+        except ValueError:
+            continue
+        if not v:
+            return
+        if v < 1 or v > len(categories):
+            continue
+        print_category(*categories[v - 1])
 
 def new_subscribe():
-    uri = raw_input('FEED URI >')
-    categories = raw_input('CATEGORIES >')
+    uri = raw_input('FEED URI> ')
+    categories = raw_input('CATEGORIES> ')
     categories = filter(lambda x: x.strip(), categories.split(','))
-    if raw_input("Add (type 'yes') >").lower() == 'yes':
+    if raw_input("Add (type 'yes')> ").lower() == 'yes':
         api.subscribe(uri, categories)
 
-def menu():
-    print 'Feedly terminal client'
-    print 
-    print '1. AUTH'
-    if api.auth_key:
-        print '2. ALL'
-        print '3. SAVED FOR LATER'
-        print '4. CATEGORIES'
-        print '5. SUBSCRIBE'
-    print '0. Quit'
-    print
-    try:
-        v = input('> ')
-        if v == 1:
-            while True:
-               if auth() == 0:
-                   return
-        elif v == 0:
+def main_menu():
+    menus = ['Auth', 'All unread items', 'Saved for later',
+             'Categories', 'Add new feed']
+    while True:
+        print_menu('Feedly terminal client',
+                   api.auth_key and menus or menus[:1],
+                   is_main=True)
+        v = raw_input('> ')
+        if v == '0':
             sys.exit(0)
-        if api.auth_key:
-            if v == 2:
-                print_streams(api.all)
-            elif v == 3:
-                print_streams(api.saved)
-            elif v == 4:
-                categories()
-            elif v == 5:
+        if v == '1':
+           auth()
+        elif api.auth_key:
+            if v == '2':
+                print_streams('All unread items', api.all)
+            elif v == '3':
+                print_streams('Saved for later', api.saved)
+            elif v == '4':
+                print_categories()
+            elif v == '5':
                 new_subscribe()
-    except Exception:
-        pass
 
-while True:
-    menu()
+if __name__ == '__main__':
+    main_menu()
