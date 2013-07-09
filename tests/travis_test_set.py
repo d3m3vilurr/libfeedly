@@ -5,7 +5,7 @@ ACCOUNT_ID = '7cbbedbc-36bb-4c04-957f-7de357cee9ed'
 def version():
     if 'PyPy'in sys.version:
         return 'pypy'
-    return '%d.%d' % (sys.version_info.major, sys.version_info.minor)
+    return '%d.%d' % sys.version_info[:2]
 
 VERSION = version()
 
