@@ -38,7 +38,7 @@ def auth():
         print_menu('Authrization', menu)
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -91,7 +91,7 @@ def print_item(item):
                           'Next', 'Prev'])
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -114,7 +114,7 @@ def print_items(title, items):
         print_menu(title, item_titles)
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -147,7 +147,7 @@ def print_subscription(subscription):
         print_menu(subscription.title, menus)
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -166,7 +166,7 @@ def print_subscriptions(label, subscriptions):
         print_menu(title, (s.title for x in subscriptions))
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -182,7 +182,7 @@ def print_category(label, data):
         print_menu(label, menus)
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
@@ -205,7 +205,7 @@ def print_categories():
         print_menu('Categories', category_names)
         v = raw_input('> ')
         try:
-            v = int(v):
+            v = int(v)
         except ValueError:
             continue
         if not v:
