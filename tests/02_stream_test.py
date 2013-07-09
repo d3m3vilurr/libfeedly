@@ -1,5 +1,6 @@
 import pytest
 import pydeely
+from travis_test_set import TEST_FEED
 
 SUBSCRIPTION = None
 
@@ -11,7 +12,7 @@ def subscription():
             TEST_TOKEN = r.read()
             api = pydeely.api.API()
             api.auth_key = TEST_TOKEN
-            SUBSCRIPTION = api.subscribe('https://news.ycombinator.com/rss')
+            SUBSCRIPTION = api.subscribe(TEST_FEED['feed_uri'])
     return SUBSCRIPTION
 
 def test_stream(subscription):
@@ -50,18 +51,6 @@ def test_save(subscription):
     item.saved_for_later = False
     item = subscription.stream.items.next()
     assert not item.saved_for_later
-
-def test_global_stream(subscription):
-    item = subscription.api.all.items.next()
-    assert item
-    item.saved_for_later = True
-    assert len(list(subscription.api.saved.items))
-    for item in subscription.api.saved.items:
-        item.saved_for_later = False
-
-def test_all_mark_as_read(subscription):
-    subscription.api.all_mark_as_read([subscription.id])
-    assert not len(list(subscription.stream.unread_items))
     
 def test_teardown(subscription):
     subscription.unsubscribe()

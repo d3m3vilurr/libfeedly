@@ -1,14 +1,7 @@
 import pytest
 import pydeely
 import time
-
-ACCOUNT_ID = '7cbbedbc-36bb-4c04-957f-7de357cee9ed'
-REFRESH_TOKEN = 'AQAARgF7InUiOiIxMDc5MDE4Mjc5MTIw' \
-                'MTEwNjE1MTYiLCJpIjoiN2NiYmVkYmMt' \
-                'MzZiYi00YzA0LTk1N2YtN2RlMzU3Y2Vl' \
-                'OWVkIiwicCI6MSwiYSI6ImZlZWRseSIs' \
-                'InYiOiJwcm9kdWN0aW9uIiwibiI6ImVW' \
-                'YjlnOTJmRDVhSEh1cDYifQ=='
+from travis_test_set import REFRESH_TOKEN, ACCOUNT_ID
 
 # TODO: test create token
 

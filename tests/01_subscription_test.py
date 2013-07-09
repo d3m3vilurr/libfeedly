@@ -1,5 +1,6 @@
 import pytest
 import pydeely
+from travis_test_set import TEST_FEED, ACCOUNT_ID
 
 TEST_TOKEN = None
 
@@ -14,21 +15,19 @@ def api():
     return api
 
 def test_subscribe(api):
-    subscription = api.subscribe('https://news.ycombinator.com/rss')    
-    assert subscription.id == 'feed/https://news.ycombinator.com/rss'
-    assert subscription.title == 'Hacker News'
-    assert subscription.website == 'https://news.ycombinator.com/'
+    subscription = api.subscribe(TEST_FEED['feed_uri'])
+    assert subscription.id == TEST_FEED['feed_id']
+    assert subscription.title == TEST_FEED['feed_title']
+    assert subscription.website == TEST_FEED['site_uri']
     assert subscription.api == api
-    assert len(list(api.subscriptions)) == 1
 
 def test_category(api):
-    api.subscribe('https://news.ycombinator.com/rss', categories=['a', 'b'])
-    subscription = api.subscriptions.next()
+    subscription = api.subscribe(TEST_FEED['feed_uri'], categories=['a', 'b'])
     assert len(subscription.categories) == 2
     assert subscription.categories[0]['label'] == 'a'
     assert subscription.categories[0]['id'] == \
-           'user/7cbbedbc-36bb-4c04-957f-7de357cee9ed/category/a'
+           'user/%s/category/a' % ACCOUNT_ID 
 
 def test_unsubscribe(api):
-    assert api.unsubscribe('https://news.ycombinator.com/rss')
+    assert api.unsubscribe(TEST_FEED['feed_uri'])
 
