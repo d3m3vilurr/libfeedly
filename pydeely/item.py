@@ -1,5 +1,6 @@
 """:mod:`pydeely.item`
 ~~~~~~~~~~~~~~~~~~~~~
+
 """
 from util import tag_id
 from datetime import datetime
@@ -8,7 +9,8 @@ from html2text import html2text
 
 class Item(object):
 
-    def __init__(self, *args, **kwds):
+    def __init__(self, api, **kwds):
+        self.api = api
         for k, v in kwds.iteritems():
             self.__setattr__(k, v)
         self.tags = getattr(self, 'tags', [])

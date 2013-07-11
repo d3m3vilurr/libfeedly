@@ -6,13 +6,14 @@ from stream import Stream
 
 class Subscription(object):
 
-    def __init__(self, **kwds):
+    def __init__(self, api, **kwds):
+        self.api = api
         for k, v in kwds.iteritems():
             self.__setattr__(k, v)
 
     @property
     def stream(self):
-        return Stream(self.id, self.api, count=40)
+        return Stream(self.id, api=self.api, count=40)
 
     @property
     def feed_uri(self):

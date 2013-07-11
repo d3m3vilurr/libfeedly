@@ -231,10 +231,10 @@ class API(object):
         return items, resp.get('continuation')
 
     def category(self, category):
-        return Stream(stream_id=category_id(self.user_id, category), api=self)
+        return Stream(category_id(self.user_id, category), api=self)
 
     def tag(self, tag):
-        return Stream(stream_id=tag_id(self.user_id, tag), api=self)
+        return Stream(tag_id(self.user_id, tag), api=self)
 
     @property
     def all(self):
