@@ -3,6 +3,8 @@
 """
 from util import tag_id
 from datetime import datetime
+from html2text import html2text
+
 
 class Item(object):
 
@@ -87,3 +89,7 @@ class Item(object):
         if content:
             return content['content']
         return ''
+
+    @property
+    def text(self):
+        return html2text(self.html)

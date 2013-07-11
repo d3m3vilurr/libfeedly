@@ -6,10 +6,10 @@
    :alt: Coverage Status
    :target: https://coveralls.io/r/d3m3vilurr/pydeely
 
-Pydeely
+pydeely
 =======
 
-Pydeely is a feedly_ unofficial API wrapper for Python.
+pydeely is a feedly_ unofficial API wrapper for Python.
 This library implement `Unofficial Feedly API document`__
 
 .. _feedly: http://feedly.com/
