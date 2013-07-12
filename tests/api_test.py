@@ -5,17 +5,17 @@ import time
 import datetime
 from urllib import quote_plus
 from urlparse import urlparse
-import pydeely
-from pydeely.utils import feed_id, category_id, tag_id
-from pydeely.subscription import Subscription
-from pydeely.stream import Stream
+import libfeedly
+from libfeedly.utils import feed_id, category_id, tag_id
+from libfeedly.subscription import Subscription
+from libfeedly.stream import Stream
 
 
 SAMPLE_PATH = os.path.dirname(__file__) + '/samples'
 URL_PREFIX = 'http://cloud.feedly.com/v3'
 
 
-class MockAPI(pydeely.api.API):
+class MockAPI(libfeedly.api.API):
 
     def __init__(self):
         super(MockAPI, self).__init__()

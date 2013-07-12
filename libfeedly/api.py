@@ -1,5 +1,5 @@
-""":mod:`pydeely.api`
-~~~~~~~~~~~~~~~~~~~~~
+""":mod:`libfeedly.api`
+~~~~~~~~~~~~~~~~~~~~~~~
 """
 import requests
 import time

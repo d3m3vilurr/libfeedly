@@ -1,5 +1,5 @@
-""":mod:`pydeely.stream`
-~~~~~~~~~~~~~~~~~~~~~
+""":mod:`libfeedly.stream`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 import urllib
 from item import Item

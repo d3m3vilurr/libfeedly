@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-import pydeely
-import pydeely.utils as utils
+import libfeedly
+import libfeedly.utils as utils
 
 def test_user_id():
     assert utils.user_id('00000000-0000-0000-0000-000000000000') \

@@ -1,15 +1,15 @@
-.. image:: https://secure.travis-ci.org/d3m3vilurr/pydeely.png?branch=master
+.. image:: https://secure.travis-ci.org/d3m3vilurr/libfeedly.png?branch=master
    :alt: Build Status
-   :target: http://travis-ci.org/d3m3vilurr/pydeely
+   :target: http://travis-ci.org/d3m3vilurr/libfeedly
 
-.. image:: https://coveralls.io/repos/d3m3vilurr/pydeely/badge.png
+.. image:: https://coveralls.io/repos/d3m3vilurr/libfeedly/badge.png
    :alt: Coverage Status
-   :target: https://coveralls.io/r/d3m3vilurr/pydeely
+   :target: https://coveralls.io/r/d3m3vilurr/libfeedly
 
-pydeely
-=======
+libfeedly
+=========
 
-pydeely is a feedly_ unofficial API wrapper for Python.
+libfeedly is a feedly_ unofficial API wrapper for Python.
 This library implement `Unofficial Feedly API document`__
 
 .. _feedly: http://feedly.com/

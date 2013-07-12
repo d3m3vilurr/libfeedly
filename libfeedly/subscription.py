@@ -1,5 +1,5 @@
-""":mod:`pydeely.subscription`
-~~~~~~~~~~~~~~~~~~~~~
+""":mod:`libfeedly.subscription`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 from stream import Stream
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-""":mod:`pydeely.utils`
-~~~~~~~~~~~~~~~~~~~~~
+""":mod:`libfeedly.utils`
+~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 import urlparse
 import urllib

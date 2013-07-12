@@ -4,8 +4,8 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name='pydeely',
-    packages=['pydeely'],
+    name='libfeedly',
+    packages=['libfeedly'],
     version='0.0.1',
     description='Feedly API for Python',
     license='MIT License',

@@ -1,5 +1,5 @@
-""":mod:`pydeely.item`
-~~~~~~~~~~~~~~~~~~~~~
+""":mod:`libfeedly.item`
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
 from utils import tag_id
