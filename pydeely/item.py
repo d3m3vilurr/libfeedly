@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~
 
 """
-from util import tag_id
+from utils import tag_id
 from datetime import datetime
 from html2text import html2text
 

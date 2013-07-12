@@ -12,8 +12,8 @@ except ImportError:
 from subscription import Subscription
 from stream import Stream
 from item import Item
-from util import user_id, feed_id, category_id, tag_id, \
-                 parse_oauth_code, APIError
+from utils import user_id, feed_id, category_id, tag_id, \
+                  parse_oauth_code, APIError
 
 
 def _append_ck(params):
@@ -86,7 +86,7 @@ class API(object):
         return self.raw_delete(uri, headers=headers, params=params)
 
     def feed(self, uri):
-        uri_path = 'feeds/%s' % urllib.quote_plus(feed_id(uri))
+        uri_path = 'feeds/%s' % feed_id(uri, escape=True)
         resp = self.get(uri_path)
         if resp.status_code != 200:
             raise APIError('Invalid input')
@@ -100,13 +100,10 @@ class API(object):
         params = dict(client_id=client_id, redirect_uri=redirect_uri,
                       scope=scope, response_type=response_type, provider=provider,
                       migrate='false')
-        resp = self.get('/auth/auth', params=params)
+        resp = self.get('auth/auth', params=params)
         if resp.status_code != 200:
             raise APIError('Not authorization')
         return resp.url
-
-    def split_auth_code(self, end_auth_uri):
-        return util.parse_oauth_code(end_auth_uri)
 
     def create_token(self, code,
                      client_id='feedly',
@@ -119,7 +116,7 @@ class API(object):
                     grant_type=grant_type, redirect_uri=redirect_uri,
                     code=code)
         headers = {'content-type': 'application/x-www-form-urlencoded'}
-        resp = self.post('/auth/token', headers=headers, data=data)
+        resp = self.post('auth/token', headers=headers, data=data)
         if resp.status_code != 200:
             raise APIError('Not authorization')
         json = resp.json()
@@ -180,17 +177,18 @@ class API(object):
 
     @property
     def categories(self):
-        _ = dict(nocategory=dict(subscriptions=[]))
+        categories = {'global.uncategorized': dict(subscriptions=[])}
         for subscription in self.subscriptions:
             if not len(subscription.categories):
-                _['nocategory']['subscriptions'].append(subscription)
-
-            for category in subscription.categories:
-                __ = _[category['label']] = _.get(category['label'],
-                                               dict(id=category['id'],
-                                                    subscriptions=[]))
-                __['subscriptions'].append(subscription)
-        return _
+                categories['global.uncategorized']['subscriptions'].append(subscription)
+            for label in subscription.categories:
+                category = categories[label] = categories.get(
+                    label,
+                    dict(id=category_id(self.user_id, label),
+                         subscriptions=[])
+                )
+                category['subscriptions'].append(subscription)
+        return categories
 
     def subscribe(self, uri, categories=None):
         info = self.feed(uri)
@@ -203,7 +201,7 @@ class API(object):
         return Subscription(api=self, **data)
 
     def unsubscribe(self, uri):
-        resp = self.delete('subscriptions/%s' % urllib.quote_plus(feed_id(uri)))
+        resp = self.delete('subscriptions/%s' % feed_id(uri, escape=True))
         if resp.status_code != 200:
             raise APIError('Not authorization')
         return True
@@ -276,13 +274,13 @@ class API(object):
 
     def tagging(self, tag, item_id):
         tag = tag.encode('utf-8')
-        uri_path = 'tags/%s' % urllib.quote_plus(tag_id(self.user_id, tag))
+        uri_path = 'tags/%s' % tag_id(self.user_id, tag, escape=True)
         resp = self.put(uri_path, data=dict(entryId=item_id))
         if resp.status_code != 200:
             raise APIError
 
     def untagging(self, tag, item_id):
-        uri_path = 'tags/%s/%s' % (urllib.quote_plus(tag_id(self.user_id, tag)),
+        uri_path = 'tags/%s/%s' % (tag_id(self.user_id, tag, escape=True),
                                    urllib.quote_plus(item_id))
         resp = self.delete(uri_path)
         if resp.status_code != 200:

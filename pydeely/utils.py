@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""":mod:`pydeely.util`
+""":mod:`pydeely.utils`
 ~~~~~~~~~~~~~~~~~~~~~
 """
 import urlparse
