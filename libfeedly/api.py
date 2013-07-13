@@ -3,17 +3,14 @@
 """
 import requests
 import time
-import urlparse
-import urllib
 try:
     import simplejson as json
 except ImportError:
     import json
-from subscription import Subscription
-from stream import Stream
-from item import Item
-from utils import user_id, feed_id, category_id, tag_id, \
-                  parse_oauth_code, APIError
+from .subscription import Subscription
+from .stream import Stream
+from .item import Item
+from .utils import *
 
 
 def _append_ck(params):
@@ -128,7 +125,7 @@ class API(object):
                       client_id='feedly',
                       client_secret='0XP4XQ07VVMDWBKUHTJM4WUQ',
                       grant_type='refresh_token'):
-        print "DEBUG: %s" % refresh_token
+        print("DEBUG: %s" % refresh_token)
         headers = {'content-type': 'application/x-www-form-urlencoded'}
         data = dict(client_id=client_id, client_secret=client_secret,
                     grant_type='refresh_token', refresh_token=refresh_token)
@@ -193,6 +190,8 @@ class API(object):
     def subscribe(self, uri, categories=None):
         info = self.feed(uri)
         categories = map(self._category, categories or [])
+        if PY3:
+            categories = list(categories)
         data = dict(id=info['id'], title=info['title'], categories=categories)
         resp = self.post('subscriptions', data=data)
         if resp.status_code != 200:
@@ -209,7 +208,7 @@ class API(object):
     def contents(self, stream_id, count=20, unread_only=False,
                         ranked='newest', continuation=None):
         stream_id = stream_id.encode('utf-8')
-        uri_path = 'streams/%s/contents' % urllib.quote_plus(stream_id)
+        uri_path = 'streams/%s/contents' % quote_plus(stream_id)
         count = int(count) or 20
         if count < 0:
             count = 20
@@ -281,7 +280,7 @@ class API(object):
 
     def untagging(self, tag, item_id):
         uri_path = 'tags/%s/%s' % (tag_id(self.user_id, tag, escape=True),
-                                   urllib.quote_plus(item_id))
+                                   quote_plus(item_id))
         resp = self.delete(uri_path)
         if resp.status_code != 200:
             raise APIError

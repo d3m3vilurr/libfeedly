@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-from utils import tag_id
+from .utils import tag_id, dict_iter
 from datetime import datetime
 from html2text import html2text
 
@@ -11,7 +11,7 @@ class Item(object):
 
     def __init__(self, api, **kwds):
         self.api = api
-        for k, v in kwds.iteritems():
+        for k, v in dict_iter(kwds):
             self.__setattr__(k, v)
         self.tags = getattr(self, 'tags', [])
         self.summary = getattr(self, 'summary', dict(content=''))
@@ -42,12 +42,10 @@ class Item(object):
 
     def untagging(self, tag):
         tid = tag_id(self.api.user_id, tag)
-        ts = filter(lambda x: x['id'] == tid, self.tags)
-        if not len(ts):
-            return
-        self.api.untagging(tag, self.id)
-        for t in ts:
-            self.tags.remove(t)
+        for tag_info in filter(lambda x: x['id'] == tid, self.tags):
+            if tag_info['label'] == tag:
+                self.api.untagging(tag, self.id)
+                self.tags.remove(tag_info)
 
     @property
     def saved_for_later(self):
@@ -87,10 +85,8 @@ class Item(object):
     @property
     def html(self):
         content = getattr(self, 'content', None) or \
-                  getattr(self, 'summary', None)
-        if content:
-            return content['content']
-        return ''
+                  getattr(self, 'summary', None) or dict(content='')
+        return content['content']
 
     @property
     def text(self):

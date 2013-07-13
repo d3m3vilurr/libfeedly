@@ -1,7 +1,8 @@
 """:mod:`libfeedly.subscription`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
-from stream import Stream
+from .stream import Stream
+from .utils import dict_iter, PY3
 
 
 class Subscription(object):
@@ -10,11 +11,13 @@ class Subscription(object):
         self.api = api
         self.id = id
         self.categories = map(
-            lambda x: x if isinstance(x, basestring) else
+            lambda x: x if isinstance(x, str) else
                       x.get('label') if isinstance(x, dict) else unicode(x),
             categories or []
         )
-        for k, v in kwds.iteritems():
+        if PY3:
+            self.categories = list(self.categories)
+        for k, v in dict_iter(kwds):
             self.__setattr__(k, v)
 
     @property

@@ -2,8 +2,15 @@
 """:mod:`libfeedly.utils`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 """
-import urlparse
-import urllib
+import sys
+
+PY3 = sys.version_info >= (3,)
+
+if PY3:
+    from urllib.parse import urlparse, quote_plus
+else:
+    from urlparse import urlparse
+    from urllib import quote_plus
 
 
 class APIError(IOError):
@@ -41,7 +48,7 @@ def feed_id(uri, escape=False):
 
     """
     fid = 'feed/%s' % uri
-    return escape and urllib.quote_plus(fid) or fid
+    return escape and quote_plus(fid) or fid
 
 def category_id(user_id, label, escape=False):
     """category label to feedly ``:category_id`` format
@@ -63,8 +70,10 @@ def category_id(user_id, label, escape=False):
         'user%2Fabc%2Fcategory%2F%EA%B0%80%EB%82%98%EB%8B%A4'
 
     """
+    if PY3 and isinstance(label, bytes):
+        label = label.decode()
     cid = '%s/category/%s' % (user_id, label)
-    return escape and urllib.quote_plus(cid.encode('utf-8')) or cid
+    return escape and quote_plus(cid.encode('utf-8')) or cid
 
 def tag_id(user_id, tag, escape=False):
     """tag to feedly ``:tag_id`` format
@@ -86,8 +95,10 @@ def tag_id(user_id, tag, escape=False):
         'user%2Fabc%2Ftag%2F%EA%B0%80%EB%82%98%EB%8B%A4'
 
     """
+    if PY3 and isinstance(tag, bytes):
+        tag = tag.decode()
     tid = '%s/tag/%s' % (user_id, tag)
-    return escape and urllib.quote_plus(tid.encode('utf-8')) or tid
+    return escape and quote_plus(tid.encode('utf-8')) or tid
 
 def parse_oauth_code(end_auth_uri):
     """parse ``code`` field of oauth end chain address
@@ -104,7 +115,7 @@ def parse_oauth_code(end_auth_uri):
         >>> parse_oauth_code('http://some/?code=abc+de&scope=')
         'abc+de'
     """
-    parse = urlparse.urlparse(end_auth_uri)
+    parse = urlparse(end_auth_uri)
     start = parse.query.find('code=')
     if start < 0:
         return
@@ -113,3 +124,8 @@ def parse_oauth_code(end_auth_uri):
     if end < 0:
         return q
     return q[:end]
+
+def dict_iter(dict):
+    if PY3:
+        return dict.items()
+    return dict.iteritems()

@@ -1,8 +1,7 @@
 """:mod:`libfeedly.stream`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
-import urllib
-from item import Item
+from .item import Item
 
 
 class Stream(object):

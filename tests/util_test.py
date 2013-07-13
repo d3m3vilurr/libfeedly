@@ -18,6 +18,8 @@ def test_category_id():
            == u'user/abc/category/가나다'
     assert utils.category_id('user/abc', u'가나다', escape=True) \
            == 'user%2Fabc%2Fcategory%2F%EA%B0%80%EB%82%98%EB%8B%A4'
+    assert utils.category_id('user/abc', b'abcd', escape=True) \
+           == 'user%2Fabc%2Fcategory%2Fabcd'
 
 def test_tag_id():
     assert utils.tag_id('user/abc', 'a') == 'user/abc/tag/a'
@@ -25,6 +27,8 @@ def test_tag_id():
            == u'user/abc/tag/가나다'
     assert utils.tag_id('user/abc', u'가나다', escape=True) \
            == 'user%2Fabc%2Ftag%2F%EA%B0%80%EB%82%98%EB%8B%A4'
+    assert utils.tag_id('user/abc', b'abcd', escape=True) \
+           == 'user%2Fabc%2Ftag%2Fabcd'
 
 def test_parse_oauth_code():
     assert utils.parse_oauth_code('http://some/?code=abcde&scope=') == 'abcde'

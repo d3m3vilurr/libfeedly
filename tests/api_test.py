@@ -3,10 +3,8 @@ import pytest
 import json
 import time
 import datetime
-from urllib import quote_plus
-from urlparse import urlparse
-import libfeedly
-from libfeedly.utils import feed_id, category_id, tag_id
+import libfeedly.api
+from libfeedly.utils import *
 from libfeedly.subscription import Subscription
 from libfeedly.stream import Stream
 
@@ -119,7 +117,7 @@ def test_feed(api):
                             title='Hacker News',
                             website='https://news.ycombinator.com/')
     header = api.history[0][2]
-    for k, v in expect_feed_info.iteritems():
+    for k, v in dict_iter(expect_feed_info):
         assert feed_info[k] == v
 
 def test_subscribe(api):
@@ -137,7 +135,10 @@ def test_subscribe(api):
                             title='Hacker News',
                             website='https://news.ycombinator.com/')
     assert header["data"]["id"] == expect_feed_info["id"]
-    assert header["data"]["categories"] == []
+    categories = header["data"]["categories"]
+    if PY3:
+        categories = list(categories)
+    assert categories == []
     assert header["data"]["title"] == expect_feed_info["title"]
     assert isinstance(subscription, Subscription)
     assert subscription.id == expect_feed_info["id"]
@@ -157,7 +158,11 @@ def test_update_feed_category(api):
     expect_header_categories = [
         dict(id=category_id(api.user_id, 'test'), label='test')
     ]
-    api.history[-1][2]["data"]["categories"] == expect_header_categories
+    categories = api.history[-1][2]["data"]["categories"]
+    if PY3:
+        categories = list(categories)
+    assert categories == expect_header_categories
+    
 
 def test_subscriptions(api):
     subscriptions = list(api.subscriptions)
@@ -167,7 +172,7 @@ def test_subscriptions(api):
 def test_categories(api):
     categories = api.categories
     assert categories
-    assert categories.keys() == ['test', 'global.uncategorized']
+    assert sorted(categories.keys()) == ['global.uncategorized', 'test']
     assert not len(categories['global.uncategorized']['subscriptions'])
     assert len(categories['test']['subscriptions'])
 
@@ -184,7 +189,7 @@ def test_category(api):
     escaped_id = category_id(api.user_id, 'test', escape=True)
     assert isinstance(stream, Stream)
     items = stream.items
-    item = items.next()
+    item = next(items)
     expects = (
         ('GET', URL_PREFIX + '/profile'),
         ('GET', URL_PREFIX + '/stream/%s/contents' % escaped_id)
@@ -198,7 +203,7 @@ def stream(api):
 
 def test_stream(stream):
     items = stream.items
-    item = items.next()
+    item = next(items)
     escaped_id = category_id(item.api.user_id, 'global.all', escape=True)
     expect = 'GET', URL_PREFIX + '/streams/%s/contents' % escaped_id
     assert item.api.history[-1][:2] == expect
@@ -206,7 +211,7 @@ def test_stream(stream):
     assert params['ranked'] == 'newest'
     assert params['unreadOnly'] == 'false'
     items = stream.unread_items
-    item = items.next()
+    item = next(items)
     params = item.api.history[-1][2]["params"]
     assert params['ranked'] == 'newest'
     assert params['unreadOnly'] == 'true'
@@ -215,7 +220,7 @@ def test_stream(stream):
 def test_saved_feed(api):
     items = api.saved.items
     assert items
-    item = items.next()
+    item = next(items)
     escaped_id = tag_id(api.user_id, 'global.saved', escape=True)
     expect = 'GET', URL_PREFIX + '/streams/%s/contents' % escaped_id
     assert api.history[-1][:2] == expect
@@ -223,7 +228,8 @@ def test_saved_feed(api):
 @pytest.fixture
 def item(stream):
     items = stream.items
-    return items.next()
+    item = next(items)
+    return item
 
 def test_mark_as_read(item):
     assert item.unread
