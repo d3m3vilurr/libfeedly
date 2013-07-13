@@ -7,6 +7,6 @@ install:
 - pip install pytest pytest-cov coveralls
 - pip install -e .
 script:
-- py.test --cov pydeely --durations=10
+- py.test --cov libfeedly --durations=10
 after_success:
 - coveralls
