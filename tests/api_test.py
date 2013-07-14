@@ -6,7 +6,7 @@ import datetime
 import requests
 import libfeedly.api
 from libfeedly.utils import *
-from libfeedly.compat import urlparse, quote_plus, xlist, dict_iter
+from libfeedly.compat import urlparse, quote_plus, dict_iter
 from libfeedly.subscription import Subscription
 from libfeedly.stream import Stream
 
@@ -140,7 +140,6 @@ def test_subscribe(api):
                             website='https://news.ycombinator.com/')
     assert header["data"]["id"] == expect_feed_info["id"]
     categories = header["data"]["categories"]
-    categories = xlist(categories)
     assert categories == []
     assert header["data"]["title"] == expect_feed_info["title"]
     assert isinstance(subscription, Subscription)
@@ -162,7 +161,6 @@ def test_update_feed_category(api):
         dict(id=category_id(api.user_id, 'test'), label='test')
     ]
     categories = api.history[-1][2]["data"]["categories"]
-    categories = xlist(categories)
     assert categories == expect_header_categories
 
 def test_subscriptions(api):

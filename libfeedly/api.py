@@ -11,7 +11,7 @@ from .subscription import Subscription
 from .stream import Stream
 from .item import Item
 from .utils import user_id, tag_id, category_id, feed_id, escape
-from .compat import xlist
+from .compat import xmap
 
 __all__ = 'API',
 
@@ -187,7 +187,7 @@ class API(object):
 
     def subscribe(self, uri, categories=None):
         info = self.feed(uri)
-        categories = xlist(map(self._category, categories or []))
+        categories = xmap(self._category, categories or [])
         data = dict(id=info['id'], title=info['title'], categories=categories)
         resp = self.post('subscriptions', data=data)
         if resp.status_code != 200:

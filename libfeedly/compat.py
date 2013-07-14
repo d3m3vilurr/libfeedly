@@ -3,7 +3,8 @@
 """
 import sys
 
-__all__ = 'PY3', 'urlparse', 'quote_plus', 'text', 'dict_iter', 'xlist'
+__all__ = 'PY3', 'urlparse', 'quote_plus', 'text', 'dict_iter', \
+          'xlist', 'xmap'
 
 PY3 = sys.version_info >= (3,)
 if PY3:
@@ -26,3 +27,6 @@ def xlist(collection):
     if isinstance(collection, list):
         return collection
     return list(collection)
+
+def xmap(*args):
+    return xlist(map(*args))

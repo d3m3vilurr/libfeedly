@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 from .stream import Stream
-from .compat import dict_iter, xlist
+from .compat import dict_iter, xmap
 
 __all__ = 'Subscription',
 
@@ -12,12 +12,11 @@ class Subscription(Stream):
     def __init__(self, api, id, categories=None, **kwds):
         self.api = api
         self.id = id
-        self.categories = map(
+        self.categories = xmap(
             lambda x: x if isinstance(x, str) else
                       x.get('label') if isinstance(x, dict) else unicode(x),
             categories or []
         )
-        self.categories = xlist(self.categories)
         for k, v in dict_iter(kwds):
             self.__setattr__(k, v)
         super(Subscription, self).__init__(self.id, self.api)
