@@ -51,7 +51,7 @@ class ItemContainer(object):
     def __iter__(self):
         for x in self._cache:
             yield x
-        while not self._cont:
+        while self._cont:
             start_idx = len(self._cache)
             self._load()
             for x in self._cache[start_idx:]:

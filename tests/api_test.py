@@ -224,6 +224,11 @@ def test_saved_feed(api):
     expect = 'GET', URL_PREFIX + '/streams/%s/contents' % escaped_id
     assert api.history[-1][:2] == expect
 
+def test_items(stream):
+    assert stream.items[0]
+    assert len(list(stream.items))
+    assert len(stream.items[:3]) == 3
+
 @pytest.fixture
 def item(stream):
     return stream.items[0]
