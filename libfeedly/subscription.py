@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 from .stream import Stream
-from .utils import dict_iter, PY3
+from .compat import dict_iter, xlist
 
 
 class Subscription(object):
@@ -15,8 +15,7 @@ class Subscription(object):
                       x.get('label') if isinstance(x, dict) else unicode(x),
             categories or []
         )
-        if PY3:
-            self.categories = list(self.categories)
+        self.categories = xlist(self.categories)
         for k, v in dict_iter(kwds):
             self.__setattr__(k, v)
 

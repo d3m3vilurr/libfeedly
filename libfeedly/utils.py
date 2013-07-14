@@ -3,14 +3,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 import sys
+from .compat import quote_plus, urlparse, text
 
-PY3 = sys.version_info >= (3,)
-
-if PY3:
-    from urllib.parse import urlparse, quote_plus
-else:
-    from urlparse import urlparse
-    from urllib import quote_plus
+__all__ = 'APIError', 'user_id', 'feed_id', 'category_id', 'tag_id', \
+          'escape', 'parse_oauth_code'
 
 
 class APIError(IOError):
@@ -70,9 +66,7 @@ def category_id(user_id, label, escape=False):
         'user%2Fabc%2Fcategory%2F%EA%B0%80%EB%82%98%EB%8B%A4'
 
     """
-    if PY3 and isinstance(label, bytes):
-        label = label.decode()
-    cid = '%s/category/%s' % (user_id, label)
+    cid = '%s/category/%s' % (user_id, text(label))
     return escape and quote_plus(cid.encode('utf-8')) or cid
 
 def tag_id(user_id, tag, escape=False):
@@ -95,9 +89,7 @@ def tag_id(user_id, tag, escape=False):
         'user%2Fabc%2Ftag%2F%EA%B0%80%EB%82%98%EB%8B%A4'
 
     """
-    if PY3 and isinstance(tag, bytes):
-        tag = tag.decode()
-    tid = '%s/tag/%s' % (user_id, tag)
+    tid = '%s/tag/%s' % (user_id, text(tag))
     return escape and quote_plus(tid.encode('utf-8')) or tid
 
 def parse_oauth_code(end_auth_uri):
@@ -125,7 +117,6 @@ def parse_oauth_code(end_auth_uri):
         return q
     return q[:end]
 
-def dict_iter(dict):
-    if PY3:
-        return dict.items()
-    return dict.iteritems()
+def escape(string):
+    string = text(string)
+    return quote_plus(string.encode('utf-8'))

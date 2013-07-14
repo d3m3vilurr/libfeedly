@@ -2,10 +2,10 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 """
-from .utils import tag_id, dict_iter
 from datetime import datetime
 from html2text import html2text
-
+from .utils import tag_id
+from .compat import dict_iter
 
 class Item(object):
 

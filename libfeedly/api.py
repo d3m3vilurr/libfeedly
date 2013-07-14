@@ -10,7 +10,8 @@ except ImportError:
 from .subscription import Subscription
 from .stream import Stream
 from .item import Item
-from .utils import *
+from .utils import user_id, tag_id, category_id, feed_id, escape
+from .compat import PY3
 
 
 def _append_ck(params):
@@ -208,7 +209,7 @@ class API(object):
     def contents(self, stream_id, count=20, unread_only=False,
                         ranked='newest', continuation=None):
         stream_id = stream_id.encode('utf-8')
-        uri_path = 'streams/%s/contents' % quote_plus(stream_id)
+        uri_path = 'streams/%s/contents' % escape(stream_id)
         count = int(count) or 20
         if count < 0:
             count = 20
@@ -280,7 +281,7 @@ class API(object):
 
     def untagging(self, tag, item_id):
         uri_path = 'tags/%s/%s' % (tag_id(self.user_id, tag, escape=True),
-                                   quote_plus(item_id))
+                                   escape(item_id))
         resp = self.delete(uri_path)
         if resp.status_code != 200:
             raise APIError

@@ -6,6 +6,7 @@ import datetime
 import requests
 import libfeedly.api
 from libfeedly.utils import *
+from libfeedly.compat import urlparse, quote_plus, xlist, dict_iter
 from libfeedly.subscription import Subscription
 from libfeedly.stream import Stream
 
@@ -139,8 +140,7 @@ def test_subscribe(api):
                             website='https://news.ycombinator.com/')
     assert header["data"]["id"] == expect_feed_info["id"]
     categories = header["data"]["categories"]
-    if PY3:
-        categories = list(categories)
+    categories = xlist(categories)
     assert categories == []
     assert header["data"]["title"] == expect_feed_info["title"]
     assert isinstance(subscription, Subscription)
@@ -162,8 +162,7 @@ def test_update_feed_category(api):
         dict(id=category_id(api.user_id, 'test'), label='test')
     ]
     categories = api.history[-1][2]["data"]["categories"]
-    if PY3:
-        categories = list(categories)
+    categories = xlist(categories)
     assert categories == expect_header_categories
     
 
@@ -191,8 +190,7 @@ def test_category(api):
     stream = api.category('test')
     escaped_id = category_id(api.user_id, 'test', escape=True)
     assert isinstance(stream, Stream)
-    items = stream.items
-    item = next(items)
+    item = stream.items[0]
     expects = (
         ('GET', URL_PREFIX + '/profile'),
         ('GET', URL_PREFIX + '/stream/%s/contents' % escaped_id)
@@ -205,16 +203,14 @@ def stream(api):
     return api.all
 
 def test_stream(stream):
-    items = stream.items
-    item = next(items)
+    item = stream.items[0]
     escaped_id = category_id(item.api.user_id, 'global.all', escape=True)
     expect = 'GET', URL_PREFIX + '/streams/%s/contents' % escaped_id
     assert item.api.history[-1][:2] == expect
     params = item.api.history[-1][2]["params"]
     assert params['ranked'] == 'newest'
     assert params['unreadOnly'] == 'false'
-    items = stream.unread_items
-    item = next(items)
+    item = stream.unread_items[0]
     params = item.api.history[-1][2]["params"]
     assert params['ranked'] == 'newest'
     assert params['unreadOnly'] == 'true'
@@ -223,16 +219,14 @@ def test_stream(stream):
 def test_saved_feed(api):
     items = api.saved.items
     assert items
-    item = next(items)
+    item = items[0]
     escaped_id = tag_id(api.user_id, 'global.saved', escape=True)
     expect = 'GET', URL_PREFIX + '/streams/%s/contents' % escaped_id
     assert api.history[-1][:2] == expect
 
 @pytest.fixture
 def item(stream):
-    items = stream.items
-    item = next(items)
-    return item
+    return stream.items[0]
 
 def test_mark_as_read(item):
     assert item.unread
