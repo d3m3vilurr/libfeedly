@@ -287,6 +287,7 @@ def test_item_save(item):
     item.saved_for_later = True
     tid = tag_id(item.api.user_id, 'global.saved')
     assert item.tags == [dict(id=tid, label='global.saved')]
+    assert item.saved_for_later
     item.saved_for_later = False
     assert item.tags == []
     assert item.href and item.html and item.text
@@ -298,7 +299,6 @@ def subscription(api):
 
 def test_subscription(subscription):
     assert subscription.feed_uri == 'http://news.ycombinator.com/rss'
-    assert isinstance(subscription.stream, Stream)
     subscription.unsubscribe()
     escaped_id = feed_id(subscription.feed_uri, escape=True)
     expect = 'DELETE', URL_PREFIX + '/subscriptions/' + escaped_id
@@ -308,6 +308,10 @@ def test_new_subscription(api):
     subscription = Subscription(api,
                                 feed_id('http://news.ycombinator.com/rss'))
     subscription.subscribe()
+    expect = 'POST', URL_PREFIX + '/subscriptions'
+    assert subscription.api.history[-1][:2] == expect
+    assert subscription.items
+    assert subscription.unread_items
 
 def test_subscription_mark_as_read(subscription):
     subscription.mark_as_read()

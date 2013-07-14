@@ -6,7 +6,7 @@ from .item import Item
 
 class Stream(object):
 
-    def __init__(self, stream_id, api, count=20, ranked='newest'):
+    def __init__(self, stream_id, api, count=40, ranked='newest'):
         self.stream_id = stream_id
         self.api = api
         self.count = count
@@ -44,7 +44,8 @@ class ItemContainer(object):
         self._cache += items
 
     def __getitem__(self, index):
-        while self._cont and index >= len(self._caches):
+        while self._cont and \
+              (index < 0 or index >= len(self._caches)):
             self.load()
         return self._cache[index]
 

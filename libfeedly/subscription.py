@@ -5,7 +5,7 @@ from .stream import Stream
 from .compat import dict_iter, xlist
 
 
-class Subscription(object):
+class Subscription(Stream):
 
     def __init__(self, api, id, categories=None, **kwds):
         self.api = api
@@ -18,10 +18,7 @@ class Subscription(object):
         self.categories = xlist(self.categories)
         for k, v in dict_iter(kwds):
             self.__setattr__(k, v)
-
-    @property
-    def stream(self):
-        return Stream(self.id, api=self.api, count=40)
+        super(Subscription, self).__init__(self.id, self.api)
 
     @property
     def feed_uri(self):
