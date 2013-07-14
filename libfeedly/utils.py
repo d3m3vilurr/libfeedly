@@ -93,9 +93,9 @@ def tag_id(user_id, tag, escape=False):
     return escape and quote_plus(tid.encode('utf-8')) or tid
 
 def parse_oauth_code(end_auth_uri):
-    """parse ``code`` field of oauth end chain address
+    """parse ``code`` param field from oauth chain URI
 
-    :param end_auth_url:
+    :param end_auth_uri:
     :type end_auth_uri: :class:`basestring`
     :returns:
     :rtype: :class:`basestring`
@@ -118,5 +118,7 @@ def parse_oauth_code(end_auth_uri):
     return q[:end]
 
 def escape(string):
+    """Escape to html entity string
+    """
     string = text(string)
     return quote_plus(string.encode('utf-8'))
