@@ -3,6 +3,7 @@ import pytest
 import json
 import time
 import datetime
+import requests
 import libfeedly.api
 from libfeedly.utils import *
 from libfeedly.subscription import Subscription
@@ -13,25 +14,25 @@ SAMPLE_PATH = os.path.dirname(__file__) + '/samples'
 URL_PREFIX = 'http://cloud.feedly.com/v3'
 
 
-class MockAPI(libfeedly.api.API):
+class MocKRequestSession(requests.Session):
 
     def __init__(self):
-        super(MockAPI, self).__init__()
+        super(MocKRequestSession, self).__init__()
         self.history = []
 
-    def raw_get(self, *args, **kwds):
+    def get(self, *args, **kwds):
         self.history.append(('GET', args[0], kwds))
         return StubResp('GET', args[0])
 
-    def raw_post(self, *args, **kwds):
+    def post(self, *args, **kwds):
         self.history.append(('POST', args[0], kwds))
         return StubResp('POST', args[0])
 
-    def raw_put(self, *args, **kwds):
+    def put(self, *args, **kwds):
         self.history.append(('PUT', args[0], kwds))
         return StubResp('PUT', args[0])
 
-    def raw_delete(self, *args, **kwds):
+    def delete(self, *args, **kwds):
         self.history.append(('DELETE', args[0], kwds))
         return StubResp('DELETE', args[0])
 
@@ -61,7 +62,9 @@ class StubResp(object):
 
 @pytest.fixture
 def api():
-    api = MockAPI()
+    api = libfeedly.api.API()
+    api._session = MocKRequestSession()
+    api.history = api._session.history
     return api
 
 def test_make_auth_url(api):
