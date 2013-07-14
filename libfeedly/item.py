@@ -7,6 +7,9 @@ from html2text import html2text
 from .utils import tag_id
 from .compat import dict_iter
 
+__all__ = 'Item',
+
+
 class Item(object):
 
     def __init__(self, api, **kwds):

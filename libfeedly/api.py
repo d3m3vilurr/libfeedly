@@ -11,12 +11,9 @@ from .subscription import Subscription
 from .stream import Stream
 from .item import Item
 from .utils import user_id, tag_id, category_id, feed_id, escape
-from .compat import PY3
+from .compat import xlist
 
-
-def _append_ck(params):
-    if not params.get('ck'):
-        params['ck'] = int(time.time())
+__all__ = 'API',
 
 
 class API(object):
@@ -190,9 +187,7 @@ class API(object):
 
     def subscribe(self, uri, categories=None):
         info = self.feed(uri)
-        categories = map(self._category, categories or [])
-        if PY3:
-            categories = list(categories)
+        categories = xlist(map(self._category, categories or []))
         data = dict(id=info['id'], title=info['title'], categories=categories)
         resp = self.post('subscriptions', data=data)
         if resp.status_code != 200:
@@ -288,3 +283,7 @@ class API(object):
 
     def _category(self, label):
         return dict(id=category_id(self.user_id, label), label=label)
+
+def _append_ck(params):
+    if not params.get('ck'):
+        params['ck'] = int(time.time())

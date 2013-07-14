@@ -4,6 +4,8 @@
 from .stream import Stream
 from .compat import dict_iter, xlist
 
+__all__ = 'Subscription',
+
 
 class Subscription(Stream):
 

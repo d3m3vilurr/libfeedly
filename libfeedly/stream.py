@@ -3,6 +3,8 @@
 """
 from .item import Item
 
+__all__ = 'Stream',
+
 
 class Stream(object):
 
@@ -26,14 +28,14 @@ class ItemContainer(object):
 
     def __init__(self, stream, unread_only):
         self.stream = stream
-        self.unread_only = unread_only 
+        self.unread_only = unread_only
         self.reload()
 
     def reload(self):
         self._cache = []
         self._cont = None
         self._load()
-    
+
     def _load(self):
         api = self.stream.api
         stream = self.stream

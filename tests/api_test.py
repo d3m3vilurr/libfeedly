@@ -164,7 +164,6 @@ def test_update_feed_category(api):
     categories = api.history[-1][2]["data"]["categories"]
     categories = xlist(categories)
     assert categories == expect_header_categories
-    
 
 def test_subscriptions(api):
     subscriptions = list(api.subscriptions)
@@ -214,7 +213,6 @@ def test_stream(stream):
     params = item.api.history[-1][2]["params"]
     assert params['ranked'] == 'newest'
     assert params['unreadOnly'] == 'true'
-    
 
 def test_saved_feed(api):
     items = api.saved.items
@@ -280,7 +278,7 @@ def test_tagging(item):
 def test_item(item):
     date = item.published_date or item.crawled_date
     assert date
-    assert isinstance(date, datetime.datetime) 
+    assert isinstance(date, datetime.datetime)
 
 def test_item_save(item):
     assert not item.saved_for_later
