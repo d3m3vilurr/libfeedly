@@ -274,9 +274,7 @@ def test_tagging(item):
     assert item.tags == []
 
 def test_item(item):
-    date = item.published_date or item.crawled_date
-    assert date
-    assert isinstance(date, datetime.datetime)
+    assert isinstance(item.date, datetime.datetime)
 
 def test_item_save(item):
     assert not item.saved_for_later

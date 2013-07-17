@@ -66,6 +66,10 @@ class Item(object):
         return self.untagging(tag)
 
     @property
+    def date(self):
+        return self.published_date or self.crawled_date
+
+    @property
     def published_date(self):
         if not getattr(self, 'published', None):
             return
